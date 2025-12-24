@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一週年禮物大抽獎</title>
+
+<style>
+body{
+  margin:0;
+  font-family:"PingFang TC","Segoe UI",sans-serif;
+  background:linear-gradient(180deg,#ffd6e5,#dbeeff);
+  color:#4a4a4a;
+  overflow:hidden;
+}
+
+.container{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:20px;
+  position:relative;
+  z-index:2;
+}
+
+h1{font-size:1.7em;margin-bottom:6px;}
+.days{font-size:.95em;margin-bottom:20px;opacity:.8;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  max-width:330px;width:100%;
+}
+
+.cell{
+  height:85px;border-radius:18px;background:#fff;
+  box-shadow:0 6px 15px rgba(0,0,0,.06);
+}
+
+.cell.active{
+  background:linear-gradient(145deg,#ffe6f0,#e9f3ff);
+  box-shadow:0 0 18px rgba(180,200,255,.9);
+}
+
+button{
+  margin-top:22px;padding:14px 36px;
+  border-radius:30px;border:none;background:#fff;
+  font-weight:bold;cursor:pointer;
+}
+
+button:disabled{opacity:.5;}
+.result{margin-top:18px;font-size:1.05em;line-height:1.6;}
+
+.footer{
+  position:absolute;bottom:10px;
+  font-size:.7em;opacity:.5;
+}
+
+/* hearts */
+.heart{
+  position:fixed;top:-10px;color:#ff9ab5;
+  animation:fall linear infinite;z-index:1;
+}
+@keyframes fall{to{transform:translateY(110vh);}}
+
+/* overlay */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(255,255,255,.9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:10;
+}
+
+.overlay img{
+  width:70%;max-width:260px;
+  border-radius:16px;
+  margin-bottom:16px;
+}
+
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:18px;
+  width:80%;
+  max-width:300px;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+  font-size:.95em;
+  line-height:1.6;
+}
+
+.card button{
+  margin-top:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>一週年禮物大抽獎 🍒</h1>
+  <div class="days" id="days"></div>
+
+  <div class="grid" id="grid"></div>
+  <button id="btn" onclick="start()">開始抽獎</button>
+
+  <div class="result" id="result"></div>
+  <div class="footer">Luo & Wei · Happy 1st Anniversary!</div>
+</div>
+
+<!-- 第三抽用 -->
+<div class="overlay" id="overlay">
+  <img src="photo.jpg">
+  <div class="card">
+    <div id="cardText"></div>
+    <button onclick="showPrize()">繼續</button>
+  </div>
+</div>
+
+<script>
+const START_DATE="2025-02-05";
+
+const CARD_TEXT=`謝謝你走到今天。
+這一年有快樂、有吵架，
+但更多的是「還好身邊是你」。`;
+
+const PRIZES={
+A:{gift:"禮物 A",message:"謝謝你選擇我。"},
+B:{gift:"禮物 B",message:"你讓平凡變得值得。"},
+C:{gift:"禮物 C",message:"日子因你而溫柔。"},
+D:{gift:"禮物 D",message:"這份禮物，代表我想陪你很久。"},
+E:{gift:"禮物 E",message:"你是我的安心。"},
+F:{gift:"禮物 F",message:"未來也一起走。"}
+};
+
+const days=document.getElementById("days");
+days.innerText=`已在一起 ${Math.floor((new Date()-new Date(START_DATE))/(86400000))} 天 💞`;
+
+const grid=document.getElementById("grid");
+const result=document.getElementById("result");
+const btn=document.getElementById("btn");
+const overlay=document.getElementById("overlay");
+const cardText=document.getElementById("cardText");
+
+let cells=[],times=0,finalPrize=null;
+for(let i=0;i<6;i++){
+  const d=document.createElement("div");
+  d.className="cell";grid.appendChild(d);cells.push(d);
+}
+
+function start(){
+  if(times>=3)return;
+  times++;result.innerHTML="";
+  let i=0,c=0,total=Math.random()*20+20;
+
+  const t=setInterval(()=>{
+    cells.forEach(x=>x.classList.remove("active"));
+    cells[i%6].classList.add("active");i++;c++;
+    if(c>total){
+      clearInterval(t);
+      if(navigator.vibrate)navigator.vibrate([200,100,200]);
+
+      if(times===3){
+        finalPrize=PRIZES.D;
+        cardText.innerText=CARD_TEXT;
+        overlay.style.display="flex";
+        btn.disabled=true;
+      }else{
+        const pool=["A","B","C","E","F"];
+        const p=PRIZES[pool[Math.floor(Math.random()*pool.length)]];
+        result.innerHTML=`🎁 ${p.gift}<br>💌 ${p.message}`;
+      }
+    }
+  },90);
+}
+
+function showPrize(){
+  overlay.style.display="none";
+  result.innerHTML=`🎁 ${finalPrize.gift}<br>💌 ${finalPrize.message}`;
+}
+
+// hearts
+setInterval(()=>{
+  const h=document.createElement("div");
+  h.className="heart";h.innerText="♥";
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=(Math.random()*10+10)+"px";
+  h.style.animationDuration=(Math.random()*3+4)+"s";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),7000);
+},300);
+</script>
+
+</body>
+</html>
