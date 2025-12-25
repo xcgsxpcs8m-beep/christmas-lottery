@@ -3,108 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💖 聖誕幸運抽獎 💖</title>
+<title>一週年禮物大抽獎</title>
 
 <style>
-* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  font-family: "Comic Sans MS","PingFang TC",sans-serif;
-  background: linear-gradient(180deg, #ffd6e8, #c9f3e8);
-  overflow: hidden;
-  color: #ff4f9a;
+body{
+  margin:0;
+  font-family:"PingFang TC","Segoe UI",sans-serif;
+  background:linear-gradient(180deg,#ffd6e5,#dbeeff);
+  color:#4a4a4a;
+  overflow:hidden;
 }
 
-.container {
-  position: relative;
-  z-index: 2;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 20px;
+.container{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:20px;
+  position:relative;
+  z-index:2;
 }
 
-h1 {
-  font-size: 1.8em;
-  margin-bottom: 10px;
-  letter-spacing: 2px;
+h1{font-size:1.7em;margin-bottom:6px;}
+.days{font-size:.95em;margin-bottom:20px;opacity:.8;}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  max-width:330px;width:100%;
 }
 
-.subtitle {
-  font-size: 0.9em;
-  margin-bottom: 15px;
-  color: #ff6fb3;
+.cell{
+  height:85px;border-radius:18px;background:#fff;
+  box-shadow:0 6px 15px rgba(0,0,0,.06);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  width: 100%;
-  max-width: 360px;
+.cell.active{
+  background:linear-gradient(145deg,#ffe6f0,#e9f3ff);
+  box-shadow:0 0 18px rgba(180,200,255,.9);
 }
 
-.cell {
-  height: 90px;
-  background: #fff;
-  border-radius: 18px;
-  border: 3px solid #ff9acb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.9em;
-  box-shadow: 0 6px 0 #ff9acb;
-  transition: all 0.2s ease;
+button{
+  margin-top:22px;padding:14px 36px;
+  border-radius:30px;border:none;background:#fff;
+  font-weight:bold;cursor:pointer;
 }
 
-.cell.active {
-  background: radial-gradient(circle, #fff6a5, #ffd1e8);
-  border-color: #ff4f9a;
-  box-shadow: 0 0 20px rgba(255,79,154,0.8);
-  transform: translateY(3px);
+button:disabled{opacity:.5;}
+.result{margin-top:18px;font-size:1.05em;line-height:1.6;}
+
+.footer{
+  position:absolute;bottom:10px;
+  font-size:.7em;opacity:.5;
 }
 
-button {
-  margin-top: 18px;
-  padding: 14px 36px;
-  border-radius: 30px;
-  border: none;
-  font-size: 1em;
-  font-weight: bold;
-  background: linear-gradient(145deg, #ff9acb, #ff4f9a);
-  color: #fff;
-  cursor: pointer;
-  box-shadow: 0 8px 0 #ff2f84;
+/* hearts */
+.heart{
+  position:fixed;top:-10px;color:#ff9ab5;
+  animation:fall linear infinite;z-index:1;
+}
+@keyframes fall{to{transform:translateY(110vh);}}
+
+/* overlay */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(255,255,255,.9);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  z-index:10;
 }
 
-button:active {
-  transform: translateY(4px);
-  box-shadow: 0 4px 0 #ff2f84;
+.overlay img{
+  width:70%;max-width:260px;
+  border-radius:16px;
+  margin-bottom:16px;
 }
 
-.result {
-  margin-top: 15px;
-  font-size: 1.1em;
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:18px;
+  width:80%;
+  max-width:300px;
+  box-shadow:0 10px 30px rgba(0,0,0,.15);
+  font-size:.95em;
+  line-height:1.6;
 }
 
-/* 雪花 */
-.snowflake {
-  position: fixed;
-  top: -10px;
-  color: #fff;
-  font-size: 1em;
-  animation: fall linear infinite;
-  opacity: 0.8;
-}
-
-@keyframes fall {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(110vh); }
+.card button{
+  margin-top:14px;
 }
 </style>
 </head>
@@ -112,79 +104,97 @@ button:active {
 <body>
 
 <div class="container">
-  <h1>🎀 聖誕幸運抽獎 🎀</h1>
-  <div class="subtitle">Sugar 💖 Spice ✨ Everything Nice</div>
+  <h1>一週年禮物大抽獎 🍒</h1>
+  <div class="days" id="days"></div>
 
   <div class="grid" id="grid"></div>
-
-  <button onclick="startLottery()">✨ 開始抽獎 ✨</button>
+  <button id="btn" onclick="start()">開始抽獎</button>
 
   <div class="result" id="result"></div>
+  <div class="footer">Luo & Wei · Happy 1st Anniversary!</div>
+</div>
+
+<!-- 第三抽用 -->
+<div class="overlay" id="overlay">
+  <img src="IMG_5656.jpeg">
+  <div class="card">
+    <div id="cardText"></div>
+    <button onclick="showPrize()">繼續</button>
+  </div>
 </div>
 
 <script>
-const prizes = [
-  "💖 可愛小禮物",
-  "🍰 任選甜點",
-  "🎄 抱一次",
-  "🥤 任選飲料",
-  "✨ 幸運加倍",
-  "🎁 神秘獎品",
-  "💰 現金500",
-  "🔄 再抽一次",
-  "👑 超級大獎"
-];
+const START_DATE="2025-02-05";
 
-const grid = document.getElementById("grid");
-const result = document.getElementById("result");
-let cells = [];
+const CARD_TEXT=`謝謝你走到今天。
+這一年有快樂、有吵架，
+但更多的是「還好身邊是你」。`;
 
-prizes.forEach(text => {
-  const div = document.createElement("div");
-  div.className = "cell";
-  div.innerText = text;
-  grid.appendChild(div);
-  cells.push(div);
-});
+const PRIZES={
+A:{gift:"禮物 A",message:"謝謝你選擇我。"},
+B:{gift:"禮物 B",message:"你讓平凡變得值得。"},
+C:{gift:"禮物 C",message:"日子因你而溫柔。"},
+D:{gift:"禮物 D",message:"這份禮物，代表我想陪你很久。"},
+E:{gift:"禮物 E",message:"你是我的安心。"},
+F:{gift:"禮物 F",message:"未來也一起走。"}
+};
 
-function startLottery() {
-  result.innerText = "";
-  let count = 0;
-  let index = 0;
-  const total = Math.floor(Math.random() * 20) + 25;
+const days=document.getElementById("days");
+days.innerText=`已在一起 ${Math.floor((new Date()-new Date(START_DATE))/(86400000))} 天 💞`;
 
-  cells.forEach(c => c.classList.remove("active"));
+const grid=document.getElementById("grid");
+const result=document.getElementById("result");
+const btn=document.getElementById("btn");
+const overlay=document.getElementById("overlay");
+const cardText=document.getElementById("cardText");
 
-  const timer = setInterval(() => {
-    cells.forEach(c => c.classList.remove("active"));
-    cells[index % 9].classList.add("active");
-    index++;
-    count++;
+let cells=[],times=0,finalPrize=null;
+for(let i=0;i<6;i++){
+  const d=document.createElement("div");
+  d.className="cell";grid.appendChild(d);cells.push(d);
+}
 
-    if (count > total) {
-      clearInterval(timer);
-      const finalIndex = (index - 1) % 9;
-      result.innerText = "🎉 抽中：「" + prizes[finalIndex] + "」";
+function start(){
+  if(times>=3)return;
+  times++;result.innerHTML="";
+  let i=0,c=0,total=Math.random()*20+20;
+
+  const t=setInterval(()=>{
+    cells.forEach(x=>x.classList.remove("active"));
+    cells[i%6].classList.add("active");i++;c++;
+    if(c>total){
+      clearInterval(t);
+      if(navigator.vibrate)navigator.vibrate([200,100,200]);
+
+      if(times===3){
+        finalPrize=PRIZES.D;
+        cardText.innerText=CARD_TEXT;
+        overlay.style.display="flex";
+        btn.disabled=true;
+      }else{
+        const pool=["A","B","C","E","F"];
+        const p=PRIZES[pool[Math.floor(Math.random()*pool.length)]];
+        result.innerHTML=`🎁 ${p.gift}<br>💌 ${p.message}`;
+      }
     }
-  }, 90);
+  },90);
 }
 
-/* 雪花生成 */
-function createSnow() {
-  const snow = document.createElement("div");
-  snow.className = "snowflake";
-  snow.innerText = "❄";
-  snow.style.left = Math.random() * 100 + "vw";
-  snow.style.fontSize = (Math.random() * 10 + 10) + "px";
-  snow.style.animationDuration = (Math.random() * 3 + 3) + "s";
-  document.body.appendChild(snow);
-
-  setTimeout(() => {
-    snow.remove();
-  }, 7000);
+function showPrize(){
+  overlay.style.display="none";
+  result.innerHTML=`🎁 ${finalPrize.gift}<br>💌 ${finalPrize.message}`;
 }
 
-setInterval(createSnow, 300);
+// hearts
+setInterval(()=>{
+  const h=document.createElement("div");
+  h.className="heart";h.innerText="♥";
+  h.style.left=Math.random()*100+"vw";
+  h.style.fontSize=(Math.random()*10+10)+"px";
+  h.style.animationDuration=(Math.random()*3+4)+"s";
+  document.body.appendChild(h);
+  setTimeout(()=>h.remove(),7000);
+},300);
 </script>
 
 </body>
